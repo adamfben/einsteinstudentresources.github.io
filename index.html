@@ -1,0 +1,1853 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A searchable directory of student resources for Albert Einstein College of Medicine.">
+  <meta name="theme-color" content="#003d7e">
+  <title>Einstein Student Resource Finder</title>
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem('einstein-resource-theme');
+        const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+        document.documentElement.dataset.theme = theme;
+      } catch (_) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #09284b;
+      --muted: #5b6f84;
+      --paper: #eff7fc;
+      --surface: #ffffff;
+      --surface-strong: #ffffff;
+      --line: #c9ddec;
+      --green: #003d7e;
+      --green-dark: #002d60;
+      --green-soft: #ddecf7;
+      --plum: #155b99;
+      --plum-soft: #e2f0f9;
+      --gold: #4b8fbe;
+      --gold-soft: #e3f1fa;
+      --blue: #003d7e;
+      --blue-soft: #dbeef9;
+      --coral: #2a70a7;
+      --coral-soft: #deedf8;
+      --sky: #95c6e7;
+      --shadow-sm: 0 1px 2px rgba(0, 61, 126, .06), 0 8px 24px rgba(0, 61, 126, .07);
+      --shadow-lg: 0 24px 70px rgba(0, 36, 74, .22);
+      --radius: 20px;
+      --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-display: Iowan Old Style, Baskerville, "Times New Roman", serif;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #edf7ff;
+      --muted: #9db3c7;
+      --paper: #061727;
+      --surface: #0b2136;
+      --surface-strong: #0d263e;
+      --line: #24445f;
+      --green: #78bce8;
+      --green-dark: #a3d5f2;
+      --green-soft: #143a58;
+      --plum: #89c8ed;
+      --plum-soft: #153b59;
+      --gold: #95c6e7;
+      --gold-soft: #163a56;
+      --blue: #95c6e7;
+      --blue-soft: #143751;
+      --coral: #84c3e9;
+      --coral-soft: #153a56;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, .2), 0 8px 24px rgba(0, 0, 0, .2);
+      --shadow-lg: 0 24px 70px rgba(0, 0, 0, .45);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      transition: color .2s ease, background-color .2s ease;
+    }
+
+    button, input, a { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+
+    :focus-visible {
+      outline: 3px solid rgba(21, 91, 153, .35);
+      outline-offset: 3px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(155, 190, 216, .68);
+      background: rgba(239, 247, 252, .91);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      width: min(1180px, calc(100% - 40px));
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-size: .95rem;
+      font-weight: 760;
+      letter-spacing: -.01em;
+    }
+
+    .brand-mark {
+      width: 39px;
+      height: 39px;
+      display: block;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 61, 126, .16);
+      background: #95c6e7;
+      box-shadow: 0 4px 10px rgba(0, 61, 126, .12);
+    }
+
+    .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 650;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link,
+    .help-button,
+    .theme-toggle {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 0 14px;
+      border: 0;
+      text-decoration: none;
+      background: transparent;
+      color: var(--ink);
+      font-size: .875rem;
+      font-weight: 680;
+      cursor: pointer;
+    }
+
+    .nav-link:hover { background: rgba(0, 61, 126, .07); color: var(--green); }
+
+    .theme-toggle {
+      gap: 8px;
+      border: 1px solid var(--line);
+      color: var(--green);
+      background: var(--surface);
+    }
+
+    .theme-toggle:hover { border-color: var(--sky); background: var(--green-soft); }
+    .theme-toggle svg { width: 17px; height: 17px; }
+    .theme-icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-icon-moon { display: none; }
+    :root[data-theme="dark"] .theme-icon-sun { display: block; }
+
+    .help-button {
+      gap: 8px;
+      color: #fff;
+      background: var(--green);
+      box-shadow: 0 6px 14px rgba(0, 61, 126, .2);
+    }
+
+    .help-button:hover { background: var(--green-dark); }
+    .help-button svg { width: 17px; height: 17px; }
+
+    .tabbar-wrap {
+      border-top: 1px solid rgba(155, 190, 216, .58);
+      background: rgba(255, 255, 255, .58);
+    }
+
+    .app-tabs {
+      width: min(1180px, calc(100% - 40px));
+      min-height: 52px;
+      margin: 0 auto;
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .app-tab {
+      position: relative;
+      min-width: 118px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 10px 10px 0 0;
+      padding: 0 15px;
+      color: var(--muted);
+      background: transparent;
+      font-size: .82rem;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .app-tab::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      bottom: 0;
+      left: 12px;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: transparent;
+    }
+
+    .app-tab:hover { color: var(--green); background: rgba(0, 61, 126, .06); }
+    .app-tab.active { color: var(--green); }
+    .app-tab.active::after { background: var(--green); }
+    .app-tab svg { width: 17px; height: 17px; }
+
+    .tab-count {
+      min-width: 20px;
+      height: 20px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      padding: 0 5px;
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: .67rem;
+      font-weight: 820;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 12% 15%, rgba(149, 198, 231, .72), transparent 28%),
+        radial-gradient(circle at 92% 90%, rgba(0, 61, 126, .14), transparent 30%),
+        #e7f3fb;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .26;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(0, 61, 126, .24) .7px, transparent .7px);
+      background-size: 18px 18px;
+      mask-image: linear-gradient(to right, #000, transparent 30%, transparent 68%, #000);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: min(920px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 40px 0 42px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 22px;
+      padding: 7px 11px;
+      border: 1px solid rgba(29, 91, 80, .18);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(255, 255, 255, .55);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(194, 141, 59, .16);
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0 auto;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 5.55rem);
+      font-weight: 500;
+      line-height: .97;
+      letter-spacing: -.058em;
+    }
+
+    h1 em {
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    .hero-copy {
+      max-width: 630px;
+      margin: 24px auto 32px;
+      color: #5d6866;
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.65;
+    }
+
+    .search-shell {
+      position: relative;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .search-box {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 16px 0 22px;
+      border: 1px solid rgba(0, 61, 126, .22);
+      border-radius: 19px;
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 18px 42px rgba(0, 61, 126, .13), inset 0 1px 0 #fff;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+
+    .search-box:focus-within {
+      border-color: rgba(0, 61, 126, .62);
+      box-shadow: 0 20px 46px rgba(0, 61, 126, .17), 0 0 0 4px rgba(149, 198, 231, .23);
+      transform: translateY(-1px);
+    }
+
+    .search-box > svg { width: 24px; height: 24px; flex: 0 0 auto; color: var(--green); }
+
+    #searchInput {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: 1.05rem;
+    }
+
+    #searchInput::placeholder { color: #788da1; }
+
+    .search-key {
+      min-width: 38px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: var(--paper);
+      font-size: .72rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .clear-search {
+      width: 36px;
+      height: 36px;
+      display: none;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--green-soft);
+      cursor: pointer;
+    }
+
+    .clear-search.visible { display: grid; }
+    .clear-search:hover { color: var(--green); background: var(--green-soft); }
+    .clear-search svg { width: 17px; height: 17px; }
+
+    .suggestions {
+      margin-top: 17px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .suggestion {
+      border: 1px solid rgba(0, 61, 126, .17);
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: var(--ink);
+      background: rgba(255,255,255,.63);
+      font-weight: 680;
+      cursor: pointer;
+    }
+
+    .suggestion:hover { border-color: rgba(0, 61, 126, .4); color: var(--green); background: var(--surface); }
+
+    main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .view[hidden], .hero[hidden] { display: none; }
+
+    .browse-section { padding: 54px 0 80px; }
+
+    .section-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 25px;
+    }
+
+    .section-kicker {
+      margin: 0 0 7px;
+      color: var(--green);
+      font-size: .73rem;
+      font-weight: 820;
+      letter-spacing: .095em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      font-weight: 500;
+      letter-spacing: -.038em;
+    }
+
+    .result-summary {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: .87rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .filters {
+      display: flex;
+      gap: 9px;
+      padding: 4px 0 28px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .filters::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      min-height: 41px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 13px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: .83rem;
+      font-weight: 720;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .filter-chip:hover { transform: translateY(-1px); border-color: var(--sky); }
+
+    .filter-chip.active {
+      border-color: var(--green);
+      color: #fff;
+      background: var(--green);
+      box-shadow: 0 7px 15px rgba(0, 61, 126, .2);
+    }
+
+    .filter-count {
+      min-width: 21px;
+      height: 21px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 99px;
+      background: rgba(0, 61, 126, .08);
+      font-size: .7rem;
+    }
+
+    .filter-chip.active .filter-count { background: rgba(255,255,255,.17); }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 17px;
+    }
+
+    .resource-card {
+      position: relative;
+      min-height: 252px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 23px;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+      animation: card-in .35s both;
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .resource-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--sky);
+      box-shadow: 0 16px 34px rgba(0, 61, 126, .12);
+    }
+
+    .card-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .card-badges { display: flex; align-items: center; gap: 7px; }
+
+    .resource-icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 14px;
+      color: var(--category-color);
+      background: var(--category-soft);
+    }
+
+    .resource-icon svg { width: 23px; height: 23px; }
+
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--paper);
+      font-size: .65rem;
+      font-weight: 780;
+      white-space: nowrap;
+    }
+
+    .source-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2a75ad;
+    }
+
+    .favorite-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--paper);
+      cursor: pointer;
+      transition: color .18s, border-color .18s, background .18s, transform .18s;
+    }
+
+    .favorite-button:hover { color: var(--plum); border-color: var(--sky); background: var(--plum-soft); transform: translateY(-1px); }
+    .favorite-button.active { color: var(--plum); border-color: var(--sky); background: var(--plum-soft); }
+    .favorite-button.active svg { fill: currentColor; }
+    .favorite-button svg { width: 17px; height: 17px; }
+    .favorite-dialog-button.active { color: var(--plum); border-color: var(--sky); background: var(--plum-soft); }
+    .favorite-dialog-button.active svg { fill: currentColor; }
+
+    .card-category {
+      margin: 20px 0 7px;
+      color: var(--category-color);
+      font-size: .69rem;
+      font-weight: 820;
+      letter-spacing: .085em;
+      text-transform: uppercase;
+    }
+
+    .resource-card h3 {
+      margin: 0;
+      font-size: 1.17rem;
+      line-height: 1.25;
+      letter-spacing: -.02em;
+    }
+
+    .card-description {
+      display: -webkit-box;
+      margin: 10px 0 22px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.55;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .card-action {
+      width: 100%;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+      border: 0;
+      border-top: 1px solid var(--line);
+      padding: 15px 0 0;
+      color: var(--green);
+      background: transparent;
+      font-size: .82rem;
+      font-weight: 780;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .card-action svg { width: 18px; height: 18px; transition: transform .18s; }
+    .resource-card:hover .card-action svg { transform: translateX(3px); }
+
+    mark {
+      border-radius: 4px;
+      padding: 0 .08em;
+      color: inherit;
+      background: #bfe2f7;
+    }
+
+    .empty-state {
+      display: none;
+      max-width: 660px;
+      margin: 26px auto 20px;
+      padding: 46px 30px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      text-align: center;
+      background: color-mix(in srgb, var(--surface) 72%, transparent);
+    }
+
+    .empty-state.visible { display: block; }
+    .empty-icon { width: 48px; height: 48px; margin: 0 auto 17px; color: var(--green); }
+    .empty-state h3 { margin: 0 0 8px; font-family: var(--font-display); font-size: 1.55rem; }
+    .empty-state p { margin: 0 auto 20px; max-width: 480px; color: var(--muted); line-height: 1.55; }
+
+    .favorites-section { min-height: 60vh; }
+
+    .feedback-section { padding: 38px 0 70px; }
+
+    .feedback-panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .feedback-head {
+      border-bottom: 1px solid var(--line);
+      padding: 30px 32px 27px;
+      background:
+        radial-gradient(circle at 100% 0, rgba(149, 198, 231, .62), transparent 36%),
+        linear-gradient(135deg, var(--green-soft), #f8fcff 72%);
+    }
+
+    .feedback-kicker,
+    .feedback-label {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-family: var(--font-sans);
+      font-size: .72rem;
+      font-weight: 820;
+      letter-spacing: .095em;
+      text-transform: uppercase;
+    }
+
+    .feedback-head h2 {
+      color: var(--ink);
+      font-size: clamp(2rem, 4vw, 2.65rem);
+    }
+
+    .feedback-form { padding: 34px 32px 32px; }
+    .feedback-intro { max-width: 760px; margin: 0 0 28px; color: var(--muted); font-size: 1rem; line-height: 1.6; }
+    .feedback-fieldset { margin: 0 0 25px; padding: 0; border: 0; }
+    .feedback-fieldset legend { margin-bottom: 12px; }
+
+    .feedback-types {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .feedback-type {
+      min-height: 50px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: var(--surface-strong);
+      font-size: .87rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .feedback-type:hover { border-color: var(--sky); color: var(--green); background: var(--green-soft); }
+    .feedback-type:has(input:checked) { border-color: var(--green); color: #fff; background: var(--green); font-weight: 760; box-shadow: 0 6px 14px rgba(0, 61, 126, .16); }
+    .feedback-type input { position: absolute; opacity: 0; pointer-events: none; }
+
+    .feedback-field { display: block; margin-bottom: 24px; }
+    .feedback-control {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 16px;
+      color: var(--ink);
+      background: var(--surface-strong);
+      outline: 0;
+    }
+
+    select.feedback-control { min-height: 58px; }
+    textarea.feedback-control { min-height: 170px; resize: vertical; padding-top: 15px; line-height: 1.55; }
+    .feedback-control::placeholder { color: var(--muted); }
+    .feedback-control:focus { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(149, 198, 231, .24); }
+
+    .feedback-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .feedback-submit,
+    .feedback-copy {
+      min-height: 52px;
+      border-radius: 12px;
+      padding: 0 20px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .feedback-submit { border: 1px solid var(--green); color: #fff; background: var(--green); box-shadow: 0 6px 14px rgba(0, 61, 126, .16); }
+    .feedback-submit:hover { background: var(--green-dark); }
+    .feedback-copy { border: 1px solid var(--line); color: var(--ink); background: var(--surface-strong); }
+    .feedback-copy:hover { border-color: var(--sky); color: var(--green); background: var(--green-soft); }
+    .feedback-note { max-width: 780px; margin: 24px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.55; }
+    .feedback-note strong { color: var(--ink); }
+    .feedback-status { min-height: 1.2em; margin: 13px 0 0; color: var(--green); font-size: .78rem; font-weight: 700; }
+
+    .reset-button {
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 15px;
+      color: #fff;
+      background: var(--green);
+      font-weight: 720;
+      cursor: pointer;
+    }
+
+    .info-strip {
+      margin: 4px 0 64px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      overflow: hidden;
+      border: 1px solid rgba(0, 61, 126, .2);
+      border-radius: 24px;
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 18px 38px rgba(0, 61, 126, .18);
+    }
+
+    .info-copy { padding: 34px 38px; }
+    .info-copy .section-kicker { color: #cfeaff; }
+    .info-copy h2 { max-width: 560px; font-size: clamp(1.8rem, 3vw, 2.65rem); }
+    .info-copy p { max-width: 570px; margin: 14px 0 0; color: #dcefff; line-height: 1.6; }
+
+    .info-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border-left: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.07);
+    }
+
+    .stat { display: flex; flex-direction: column; justify-content: center; padding: 28px 30px; }
+    .stat:first-child { border-right: 1px solid rgba(255,255,255,.12); }
+    .stat strong { font-family: var(--font-display); font-size: 2.5rem; font-weight: 500; }
+    .stat span { margin-top: 4px; color: #cfe9fb; font-size: .8rem; font-weight: 700; }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: var(--green-soft);
+    }
+
+    .footer-inner {
+      width: min(1180px, calc(100% - 40px));
+      min-height: 112px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      color: var(--muted);
+      font-size: .77rem;
+      line-height: 1.5;
+    }
+
+    .footer-inner p { max-width: 700px; margin: 0; }
+    .footer-badge { display: inline-flex; align-items: center; gap: 8px; font-weight: 750; white-space: nowrap; }
+    .footer-badge svg { width: 18px; height: 18px; color: var(--green); }
+
+    dialog {
+      width: min(680px, calc(100% - 28px));
+      max-height: min(82vh, 760px);
+      margin: auto;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 25px;
+      padding: 0;
+      color: var(--ink);
+      background: var(--surface-strong);
+      box-shadow: var(--shadow-lg);
+    }
+
+    dialog::backdrop { background: rgba(21, 35, 33, .55); backdrop-filter: blur(5px); }
+    dialog[open] { animation: dialog-in .2s ease-out; }
+
+    @keyframes dialog-in {
+      from { opacity: 0; transform: translateY(16px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dialog-scroll { max-height: min(82vh, 760px); overflow-y: auto; }
+
+    .dialog-top {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: flex-end;
+      padding: 14px 14px 0;
+      background: linear-gradient(var(--surface-strong) 62%, transparent);
+    }
+
+    .dialog-close {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--muted);
+      background: var(--paper);
+      cursor: pointer;
+    }
+
+    .dialog-close:hover { color: var(--green); background: var(--green-soft); }
+    .dialog-close svg { width: 18px; height: 18px; }
+
+    .dialog-body { padding: 0 38px 38px; }
+    .dialog-icon { width: 54px; height: 54px; border-radius: 16px; margin-bottom: 18px; }
+    .dialog-category { margin: 0 0 7px; color: var(--dialog-color); font-size: .72rem; font-weight: 820; letter-spacing: .08em; text-transform: uppercase; }
+    .dialog-body h2 { font-size: clamp(2rem, 6vw, 3.15rem); line-height: 1; }
+    .dialog-description { margin: 15px 0 25px; color: var(--muted); font-size: .98rem; line-height: 1.65; }
+
+    .crisis-box {
+      display: none;
+      margin: 0 0 24px;
+      border: 1px solid #b8d9ee;
+      border-radius: 15px;
+      padding: 14px 15px;
+      color: #0b4c8c;
+      background: #edf7fd;
+      font-size: .81rem;
+      line-height: 1.55;
+    }
+
+    .crisis-box.visible { display: block; }
+    .crisis-box strong { display: block; margin-bottom: 2px; }
+
+    .detail-list {
+      margin: 0 0 25px;
+      padding: 0;
+      list-style: none;
+      counter-reset: detail;
+    }
+
+    .detail-list li {
+      position: relative;
+      min-height: 38px;
+      padding: 0 0 16px 43px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.55;
+      counter-increment: detail;
+    }
+
+    .detail-list li::before {
+      content: counter(detail);
+      position: absolute;
+      left: 0;
+      top: -2px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: .72rem;
+      font-weight: 820;
+    }
+
+    .contact-row { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 26px; }
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: var(--ink);
+      text-decoration: none;
+      background: var(--paper);
+      font-size: .78rem;
+      font-weight: 690;
+    }
+
+    .contact-link:hover { color: var(--green); border-color: var(--sky); }
+    .contact-link svg { width: 15px; height: 15px; }
+
+    .dialog-actions { display: flex; gap: 10px; margin-bottom: 26px; }
+    .primary-link, .secondary-link {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border-radius: 12px;
+      padding: 0 17px;
+      text-decoration: none;
+      font-size: .84rem;
+      font-weight: 780;
+      cursor: pointer;
+    }
+
+    .primary-link { color: #fff; background: var(--green); box-shadow: 0 8px 16px rgba(0, 61, 126, .2); }
+    .primary-link:hover { background: var(--green-dark); }
+    .secondary-link { border: 1px solid var(--line); color: var(--ink); background: var(--paper); }
+    .primary-link svg, .secondary-link svg { width: 16px; height: 16px; }
+
+    .source-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 15px;
+      background: var(--paper);
+      color: var(--muted);
+      font-size: .72rem;
+      line-height: 1.5;
+    }
+
+    .source-box strong { display: block; margin-bottom: 2px; color: var(--ink); font-size: .74rem; }
+    .source-file { overflow-wrap: anywhere; }
+
+    .help-dialog .dialog-body { padding-top: 0; }
+    .help-dialog h2 { margin-bottom: 12px; color: var(--plum); }
+    .help-dialog .dialog-description { margin-top: 0; }
+    .emergency-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 23px 0; }
+    .emergency-link { min-height: 74px; display: flex; flex-direction: column; justify-content: center; border-radius: 14px; padding: 13px 15px; text-decoration: none; background: var(--plum-soft); color: var(--plum); }
+    .emergency-link strong { font-size: 1.05rem; }
+    .emergency-link span { margin-top: 3px; font-size: .73rem; }
+    .emergency-link.urgent { color: var(--blue); background: var(--coral-soft); }
+
+    :root[data-theme="dark"] .site-header {
+      border-color: rgba(70, 112, 146, .72);
+      background: rgba(6, 23, 39, .92);
+    }
+
+    :root[data-theme="dark"] .tabbar-wrap {
+      border-color: rgba(70, 112, 146, .6);
+      background: rgba(9, 31, 50, .76);
+    }
+
+    :root[data-theme="dark"] .brand-mark { border-color: #4b89b4; }
+
+    :root[data-theme="dark"] .theme-toggle {
+      color: #b9e0f7;
+      background: #0d2942;
+    }
+
+    :root[data-theme="dark"] .help-button,
+    :root[data-theme="dark"] .filter-chip.active,
+    :root[data-theme="dark"] .primary-link,
+    :root[data-theme="dark"] .reset-button {
+      border-color: #236fa7;
+      color: #fff;
+      background: #155f98;
+    }
+
+    :root[data-theme="dark"] .help-button:hover,
+    :root[data-theme="dark"] .primary-link:hover { background: #1d75ad; }
+
+    :root[data-theme="dark"] .hero {
+      background:
+        radial-gradient(circle at 12% 15%, rgba(42, 112, 167, .28), transparent 30%),
+        radial-gradient(circle at 92% 90%, rgba(149, 198, 231, .12), transparent 30%),
+        #081d30;
+    }
+
+    :root[data-theme="dark"] .hero::after { background-image: radial-gradient(rgba(149, 198, 231, .22) .7px, transparent .7px); }
+
+    :root[data-theme="dark"] .search-box {
+      border-color: #315774;
+      background: rgba(11, 33, 54, .96);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    :root[data-theme="dark"] .search-box:focus-within { border-color: #95c6e7; box-shadow: 0 20px 46px rgba(0, 0, 0, .3), 0 0 0 4px rgba(149, 198, 231, .1); }
+    :root[data-theme="dark"] #searchInput::placeholder { color: #849caf; }
+    :root[data-theme="dark"] .suggestion { color: var(--ink); background: rgba(14, 42, 66, .78); }
+    :root[data-theme="dark"] .suggestion:hover { background: #143a58; }
+    :root[data-theme="dark"] .app-tab:hover { background: rgba(149, 198, 231, .07); }
+
+    :root[data-theme="dark"] .filter-chip,
+    :root[data-theme="dark"] .favorite-button,
+    :root[data-theme="dark"] .source-pill,
+    :root[data-theme="dark"] .contact-link,
+    :root[data-theme="dark"] .secondary-link,
+    :root[data-theme="dark"] .source-box,
+    :root[data-theme="dark"] .dialog-close {
+      color: var(--muted);
+      background: #0e2a43;
+    }
+
+    :root[data-theme="dark"] .resource-icon {
+      color: #c6e7fa;
+      background: color-mix(in srgb, var(--category-color) 32%, #0b2136);
+    }
+
+    :root[data-theme="dark"] .feedback-head {
+      background:
+        radial-gradient(circle at 100% 0, rgba(149, 198, 231, .17), transparent 36%),
+        linear-gradient(135deg, #103752, #0b2136 72%);
+    }
+
+    :root[data-theme="dark"] .feedback-type:has(input:checked),
+    :root[data-theme="dark"] .feedback-submit {
+      border-color: #236fa7;
+      color: #fff;
+      background: #155f98;
+    }
+
+    :root[data-theme="dark"] .feedback-type:hover,
+    :root[data-theme="dark"] .feedback-copy:hover {
+      border-color: #4d94be;
+      color: #c8e8fa;
+      background: #123b59;
+    }
+
+    :root[data-theme="dark"] .card-category,
+    :root[data-theme="dark"] .dialog-category { color: #95c6e7; }
+    :root[data-theme="dark"] .card-action { border-color: var(--line); }
+    :root[data-theme="dark"] mark { color: #f4fbff; background: #245c84; }
+    :root[data-theme="dark"] .empty-state { background: rgba(11, 33, 54, .62); }
+    :root[data-theme="dark"] .info-strip { border-color: #286d9f; background: #0e4f83; }
+    :root[data-theme="dark"] footer { background: #0a2034; }
+    :root[data-theme="dark"] dialog::backdrop { background: rgba(0, 9, 18, .72); }
+    :root[data-theme="dark"] .dialog-top { background: linear-gradient(var(--surface-strong) 62%, transparent); }
+    :root[data-theme="dark"] .crisis-box { border-color: #32658a; color: #d9effd; background: #123653; }
+    :root[data-theme="dark"] .emergency-link { color: #bde3f8; background: #153b59; }
+    :root[data-theme="dark"] .emergency-link.urgent { color: #cbe9fa; background: #194866; }
+    :root[data-theme="dark"] .favorite-dialog-button.active,
+    :root[data-theme="dark"] .favorite-button.active { color: #c6e8fa; border-color: #4f91bb; background: #184462; }
+
+    @media (max-width: 900px) {
+      .resource-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .info-strip { grid-template-columns: 1fr; }
+      .info-meta { border-left: 0; border-top: 1px solid rgba(255,255,255,.12); }
+    }
+
+    @media (max-width: 660px) {
+      .nav { width: min(100% - 28px, 1180px); min-height: 66px; }
+      .brand small, .nav-link { display: none; }
+      .brand { gap: 8px; font-size: .82rem; }
+      .brand-mark { width: 35px; height: 35px; border-radius: 10px; }
+      .nav-links { gap: 6px; }
+      .theme-toggle, .help-button { width: 38px; min-height: 38px; padding: 0; gap: 0; }
+      .theme-toggle span { display: none; }
+      .help-button { font-size: 0; }
+      .app-tabs { width: min(100% - 16px, 1180px); min-height: 48px; }
+      .app-tab { min-width: 0; flex: 1; padding: 0 7px; font-size: .75rem; }
+      .hero-inner { width: min(100% - 28px, 920px); padding: 30px 0 32px; }
+      .search-box { min-height: 64px; padding-left: 17px; border-radius: 16px; }
+      .search-key { display: none; }
+      .suggestions > span { width: 100%; }
+      main { width: min(100% - 28px, 1180px); }
+      .browse-section { padding: 42px 0 58px; }
+      .section-top { align-items: flex-start; flex-direction: column; gap: 10px; }
+      .result-summary { margin: 0; }
+      .resource-grid { grid-template-columns: 1fr; }
+      .resource-card { min-height: 236px; }
+      .info-copy { padding: 30px 24px; }
+      .info-meta { grid-template-columns: 1fr 1fr; }
+      .stat { padding: 22px; }
+      .footer-inner { min-height: 140px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 12px; }
+      .dialog-body { padding: 0 22px 25px; }
+      .dialog-actions { flex-direction: column; }
+      .primary-link, .secondary-link { width: 100%; }
+      .emergency-actions { grid-template-columns: 1fr; }
+      .feedback-section { padding: 24px 0 54px; }
+      .feedback-head { padding: 22px 20px 19px; }
+      .feedback-form { padding: 27px 20px 25px; }
+      .feedback-types { grid-template-columns: 1fr; }
+      .feedback-type { min-height: 48px; }
+      .feedback-actions { align-items: stretch; flex-direction: column; }
+      .feedback-submit, .feedback-copy { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Student Resource Finder home">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="assets/app-icon.jpg" alt="">
+        </span>
+        <span>Student Resource Finder<small>Einstein student prototype</small></span>
+      </a>
+      <div class="nav-links">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 15.2A9 9 0 0 1 8.8 3.2 9 9 0 1 0 20.8 15.2Z"/></svg>
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <span id="themeLabel">Dark mode</span>
+        </button>
+        <button class="help-button" id="openHelp" type="button" aria-label="Get urgent help" title="Get urgent help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="M12 8v4M12 16h.01"/></svg>
+          Get urgent help
+        </button>
+      </div>
+    </nav>
+    <div class="tabbar-wrap">
+      <div class="app-tabs" role="tablist" aria-label="App sections">
+        <button class="app-tab active" type="button" role="tab" aria-selected="true" aria-controls="resourcesView" data-view="resources">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"/><path d="M8 7h8M8 11h6"/></svg>
+          Resources
+        </button>
+        <button class="app-tab" type="button" role="tab" aria-selected="false" aria-controls="favoritesView" data-view="favorites">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
+          Favorites <span class="tab-count" id="favoriteCount">0</span>
+        </button>
+        <button class="app-tab" type="button" role="tab" aria-selected="false" aria-controls="feedbackView" data-view="feedback">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/><path d="M8 9h8M8 13h5"/></svg>
+          Feedback
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="top" class="hero">
+    <div class="hero-inner">
+      <div class="search-shell">
+        <label class="search-box" for="searchInput">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="searchInput" type="search" autocomplete="off" placeholder="Try “Wi-Fi,” “mental health,” or “work order”" aria-describedby="searchHint">
+          <span class="search-key" aria-hidden="true">⌘ K</span>
+          <button class="clear-search" id="clearSearch" type="button" aria-label="Clear search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>
+          </button>
+        </label>
+        <div class="suggestions" id="searchHint">
+          <span>Popular:</span>
+          <button class="suggestion" type="button" data-query="peer tutoring">Peer tutoring</button>
+          <button class="suggestion" type="button" data-query="student health">Student health</button>
+          <button class="suggestion" type="button" data-query="shuttle">Shuttle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="view" id="resourcesView" role="tabpanel">
+      <section class="browse-section" id="resources" aria-labelledby="resources-title">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">Resource directory</p>
+            <h2 id="resources-title">Browse student support</h2>
+          </div>
+          <p class="result-summary" id="resultSummary" aria-live="polite">9 resources</p>
+        </div>
+        <div class="filters" id="filters" aria-label="Filter by category"></div>
+        <div class="resource-grid" id="resourceGrid"></div>
+        <div class="empty-state" id="emptyState">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8.5 10h5M11 7.5v5"/></svg>
+          <h3>No exact match yet</h3>
+          <p>Try a broader phrase like “health,” “housing,” or “IT,” or reset the filters to see the full directory.</p>
+          <button class="reset-button" id="resetSearch" type="button">Show all resources</button>
+        </div>
+      </section>
+
+    </div>
+
+    <section class="view browse-section favorites-section" id="favoritesView" role="tabpanel" aria-labelledby="favorites-title" hidden>
+      <div class="section-top">
+        <div>
+          <p class="section-kicker">Saved resources</p>
+          <h2 id="favorites-title">Your favorites</h2>
+        </div>
+        <p class="result-summary" id="favoritesSummary" aria-live="polite">0 saved resources</p>
+      </div>
+      <div class="resource-grid" id="favoritesGrid"></div>
+      <div class="empty-state visible" id="favoritesEmpty">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
+        <h3>No favorites yet</h3>
+        <p>Use the star on any resource card to keep important links together here.</p>
+        <button class="reset-button" id="browseResources" type="button">Browse resources</button>
+      </div>
+    </section>
+
+    <section class="view feedback-section" id="feedbackView" role="tabpanel" aria-labelledby="feedback-title" hidden>
+      <div class="feedback-panel">
+        <header class="feedback-head">
+          <p class="feedback-kicker">Help improve this app</p>
+          <h2 id="feedback-title">Suggest</h2>
+        </header>
+        <form class="feedback-form" id="feedbackForm">
+          <p class="feedback-intro">Something missing, out of date, or pointing at a dead link? Tell the team running this app.</p>
+          <fieldset class="feedback-fieldset">
+            <legend class="feedback-label">What is this about</legend>
+            <div class="feedback-types">
+              <label class="feedback-type"><input type="radio" name="feedbackType" value="Missing resource" checked>Missing resource</label>
+              <label class="feedback-type"><input type="radio" name="feedbackType" value="Broken link">Broken link</label>
+              <label class="feedback-type"><input type="radio" name="feedbackType" value="Correction">Correction</label>
+            </div>
+          </fieldset>
+          <label class="feedback-field">
+            <span class="feedback-label">Related resource</span>
+            <select class="feedback-control" id="feedbackResource" name="resource">
+              <option value="Not about a specific resource">Not about a specific resource</option>
+            </select>
+          </label>
+          <label class="feedback-field">
+            <span class="feedback-label">Details</span>
+            <textarea class="feedback-control" id="feedbackDetails" name="details" required placeholder="What is missing, wrong, or hard to find?"></textarea>
+          </label>
+          <div class="feedback-actions">
+            <button class="feedback-submit" type="submit">Open in email</button>
+            <button class="feedback-copy" id="copyFeedback" type="button">Copy instead</button>
+          </div>
+          <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
+          <p class="feedback-note">This writes the message for you and hands it to your email app addressed to <strong>student-resources@example.edu</strong> — nothing is sent until you press send there.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="resourceDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-scroll">
+      <div class="dialog-top">
+        <button class="dialog-close" type="button" data-close="resourceDialog" aria-label="Close resource details">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>
+        </button>
+      </div>
+      <div class="dialog-body" id="dialogBody"></div>
+    </div>
+  </dialog>
+
+  <dialog class="help-dialog" id="helpDialog" aria-labelledby="helpTitle">
+    <div class="dialog-scroll">
+      <div class="dialog-top">
+        <button class="dialog-close" type="button" data-close="helpDialog" aria-label="Close urgent help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <p class="section-kicker">Immediate support</p>
+        <h2 id="helpTitle">You don’t have to handle a crisis alone.</h2>
+        <p class="dialog-description">If you or someone else is in immediate danger or needs urgent medical attention, call 911. Free, confidential crisis support is also available 24/7.</p>
+        <div class="emergency-actions">
+          <a class="emergency-link urgent" href="tel:911"><strong>Call 911</strong><span>Immediate danger or medical emergency</span></a>
+          <a class="emergency-link" href="tel:988"><strong>Call or text 988</strong><span>Suicide &amp; Crisis Lifeline</span></a>
+        </div>
+        <a class="primary-link" href="https://einsteinmed.edu/education/life-einstein/for-students/health-wellness/student-mental-health-center" target="_blank" rel="noopener noreferrer">
+          Einstein mental health resources
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const icons = {
+      book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12Z"/><path d="M8 8h8M8 12h6"/></svg>',
+      laundry: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="2"/><path d="M4 7.5h16"/><circle cx="12" cy="14.5" r="4"/><path d="M7 5h.01M10 5h.01"/></svg>',
+      tool: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5-5L7.4 3.6l3 3 2.3-2.3a4 4 0 0 1 2 2Z"/><path d="m10.5 6.5-8 8a2.1 2.1 0 0 0 3 3l8-8"/><path d="m14 13 6.5 6.5"/></svg>',
+      wifi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.6a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9.2a14 14 0 0 1 20 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg>',
+      jury: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 8 4H4l8-4ZM5 9v7M9.5 9v7M14.5 9v7M19 9v7M3 20h18M2 17h20"/></svg>',
+      shuttle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="13" rx="3"/><path d="M3 11h18M7 8h4M7 18v2M17 18v2"/><circle cx="7" cy="15" r="1" fill="currentColor"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>',
+      shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-3.7 7-10V5l-7-2-7 2v6c0 6.3 7 10 7 10Z"/><path d="m9 12 2 2 4-4"/></svg>',
+      heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/><path d="M7.5 12h2l1.2-2.4 2.1 5 1.2-2.6h2.5"/></svg>',
+      clinic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M9 21v-5h6v5"/><path d="M12 6v6M9 9h6"/></svg>',
+      arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+      external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>',
+      mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>',
+      favorite: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>'
+    };
+
+    const categoryMeta = {
+      education: { label: 'Education', color: '#003d7e', soft: '#dceefa' },
+      housing: { label: 'Housing', color: '#1b5d98', soft: '#e2f1fa' },
+      it: { label: 'IT & access', color: '#0b4c8c', soft: '#d8ebf8' },
+      miscellaneous: { label: 'Student life', color: '#377fb2', soft: '#e5f3fb' },
+      health: { label: 'Student health', color: '#15528e', soft: '#dcecf8' }
+    };
+
+    const resources = [
+      {
+        id: 'peer-tutor', title: 'Peer Tutor & Mentor Support', category: 'education', icon: 'book', featured: true,
+        description: 'Get matched with free peer tutoring or mentoring for coursework, board preparation, clerkships, and student life.',
+        keywords: 'academic support tutor tutoring mentor mentoring study usmle step shelf exam appointment request form oasc',
+        details: [
+          'Use Einstein’s Peer Support Network to request a tutor or mentor matched to your needs.',
+          'Peer tutoring is available for basic science and systems courses, USMLE Step 1 and Step 2, shelf exams, and study strategy.',
+          'Scheduling is arranged directly between you and your tutor or mentor.'
+        ],
+        url: 'https://einsteinmed.edu/education/life-einstein/for-students/academic-support-counseling/peer-support-network',
+        action: 'View peer support',
+        contacts: [
+          { type: 'mail', label: 'oasc@einsteinmed.edu', href: 'mailto:oasc@einsteinmed.edu' },
+          { type: 'phone', label: '718-430-3154', href: 'tel:+17184303154' }
+        ],
+        sourceFile: 'Education / Peer Tutor Form.docx',
+        provenance: 'The supplied document contains no destination. This result uses the school’s official Peer Support Network page.'
+      },
+      {
+        id: 'laundry', title: 'Laundry in Student Housing', category: 'housing', icon: 'laundry',
+        description: 'Find the school’s housing guidance for using and monitoring residence-hall laundry machines.',
+        keywords: 'washer dryer washing clothes residence apartment hercules cp mobile app housing faq',
+        details: [
+          'The official housing FAQ directs residents to the Hercules CP Mobile app for laundry.',
+          'Use the app to manage laundry and check a machine’s status while it is in use.',
+          'Open the housing FAQ for the latest housing instructions and related contacts.'
+        ],
+        url: 'https://einsteinmed.edu/docs/administration/auxiliary-services/housing/housing-faqs.pdf',
+        action: 'Open housing FAQ',
+        contacts: [],
+        sourceFile: 'Housing / Laundry.docx',
+        provenance: 'The supplied document contains no destination. This result uses the school’s official Housing FAQ.'
+      },
+      {
+        id: 'work-order', title: 'Housing Work Order', category: 'housing', icon: 'tool', featured: true,
+        description: 'Submit a maintenance request for an issue in Einstein student housing through the housing work-order portal.',
+        keywords: 'repair maintenance apartment residence broken leak ac heat internet request archibus emergency facilities',
+        details: [
+          'Open the housing work-order portal and sign in with your Einstein credentials.',
+          'Describe the problem and include enough detail for the maintenance team to locate and assess it.',
+          'For an after-hours housing emergency such as flooding, loss of power, fire, or a gas odor, contact the 1935 security desk.'
+        ],
+        url: 'https://montefiore-archibus.buildingi.com/archibus/schema/ab-products/essential/workplace/index.html',
+        action: 'Open work-order portal',
+        secondary: { label: 'Housing FAQ', href: 'https://einsteinmed.edu/docs/administration/auxiliary-services/housing/housing-faqs.pdf' },
+        contacts: [{ type: 'phone', label: 'After-hours: 718-430-3066', href: 'tel:+17184303066' }],
+        sourceFile: 'Housing / Work Order.docx',
+        provenance: 'The main work-order destination comes directly from the supplied document; the housing FAQ supplies supporting guidance.'
+      },
+      {
+        id: 'wifi', title: 'EinsteinSecure Wi-Fi', category: 'it', icon: 'wifi', featured: true,
+        description: 'Enroll a phone or computer on EinsteinSecure with the SecureW2 setup flow for your device.',
+        keywords: 'wifi wi-fi internet wireless network connect certificate securew2 windows mac iphone android password it setup',
+        details: [
+          'Open the enrollment link from the device you want to connect and follow the SecureW2 prompts.',
+          'Authenticate once with your Montefiore Active Directory credentials when prompted.',
+          'After installing the profile or wrapper, select EinsteinSecure when you are on campus.'
+        ],
+        url: 'https://cloud.securew2.com/public/31777/EinsteinSecure/',
+        action: 'Start Wi-Fi setup',
+        secondary: { label: 'Read device instructions', href: 'https://it.einsteinmed.edu/documentation/how-to-connect-to-einsteinsecure/' },
+        contacts: [],
+        sourceFile: 'IT / Wi-Fi Access.docx',
+        provenance: 'The enrollment destination comes directly from the supplied document; the official IT page supplies device guidance.'
+      },
+      {
+        id: 'jury-duty', title: 'Jury Duty Guidance', category: 'miscellaneous', icon: 'jury',
+        description: 'Review school guidance and documentation for responding to a jury-duty summons while enrolled.',
+        keywords: 'court summons civic service absence attendance postponement deferment letter policy documentation',
+        details: [
+          'Open the school’s jury-duty document before responding to a summons.',
+          'Confirm any attendance, documentation, or scheduling requirements with Student Affairs if your service could affect coursework or clinical duties.',
+          'Because court and school requirements can change, use the linked document as the current point of reference.'
+        ],
+        url: 'https://einsteinmed.edu/uploadedFiles/education/student-affairs/student-activities/jury-duty.pdf',
+        action: 'View jury-duty guide',
+        contacts: [],
+        sourceFile: 'Miscellaneous / Jury Duty.docx',
+        provenance: 'The supplied document contains no destination. This result uses a school-hosted jury-duty guide.'
+      },
+      {
+        id: 'shuttle', title: 'Clerkship Shuttle & E-Car', category: 'miscellaneous', icon: 'shuttle', featured: true,
+        description: 'Check clerkship transportation between Belfer and Montefiore-Moses, plus E-Car reservation and safety guidance.',
+        keywords: 'transport bus route schedule ride car service clerkship moses belfer ecar best deal commute',
+        details: [
+          'The clerkship shuttle runs between Belfer at 1300 Morris Park Avenue and Montefiore-Moses on weekdays.',
+          'For other supported clerkship locations or off-hours travel, use the E-Car reservation system described in the guide.',
+          'Match the arriving vehicle and license plate to your confirmation before getting in.'
+        ],
+        url: 'https://einsteinmed.edu/docs/administration/auxiliary-services/einstein-student-transportation-to-clerkship.pdf',
+        action: 'View transportation guide',
+        contacts: [
+          { type: 'mail', label: 'transport@einsteinmed.edu', href: 'mailto:transport@einsteinmed.edu' },
+          { type: 'phone', label: 'Best Deal: 718-798-5555', href: 'tel:+17187985555' }
+        ],
+        sourceFile: 'Miscellaneous / Shuttle Schedule.docx',
+        provenance: 'The supplied document contains no destination. This result uses the school’s official clerkship transportation guide.'
+      },
+      {
+        id: 'health-insurance', title: 'Student Health Insurance', category: 'health', icon: 'shield',
+        description: 'Find current health-insurance budget information and the school’s note about waiving coverage with a comparable plan.',
+        keywords: 'coverage plan waive waiver comparable insurance premium cost fee benefits medical anthem finance budget',
+        details: [
+          'Review the current M.D. cost-of-attendance page for the student health-insurance budget line.',
+          'The school notes that student health insurance may be waived with proof of comparable insurance.',
+          'Confirm deadlines, plan terms, and waiver documentation with the responsible school office before taking action.'
+        ],
+        url: 'https://einsteinmed.edu/education/student-finance/cost-attendance-md-students',
+        action: 'Review insurance information',
+        contacts: [],
+        sourceFile: 'Student Health / Health Insurance.docx',
+        provenance: 'The supplied document contains no destination. This result uses the school’s current M.D. cost-of-attendance page.'
+      },
+      {
+        id: 'mental-health', title: 'Student Mental Health Center', category: 'health', icon: 'heart', featured: true, crisis: true,
+        description: 'Access free, confidential counseling, medication consultation, group therapy, and referrals for longer-term care.',
+        keywords: 'counseling therapist therapy stress anxiety depression crisis confidential psychiatry appointment wellness support 988',
+        details: [
+          'The center offers free, confidential mental health services to Einstein students and trainees by appointment.',
+          'Available care includes short-term counseling, medication consultation and management, and group psychotherapy.',
+          'Appointments may be in person or virtual. Call the center or use the official page for current scheduling details.'
+        ],
+        url: 'https://einsteinmed.edu/education/life-einstein/for-students/health-wellness/student-mental-health-center',
+        action: 'View care options',
+        contacts: [{ type: 'phone', label: 'Appointments: 718-839-7400', href: 'tel:+17188397400' }],
+        sourceFile: 'Student Health / Mental Health.docx',
+        provenance: 'The destination comes directly from the supplied document. Contact and crisis details are from the same official page.'
+      },
+      {
+        id: 'student-health', title: 'Student Health Center', category: 'health', icon: 'clinic', featured: true,
+        description: 'Schedule primary care, preventive services, immunizations, sexual health care, or a referral to specialty care.',
+        keywords: 'doctor primary care appointment physical illness injury immunization vaccine sexual health mychart clinic occupational exposure medical',
+        details: [
+          'The Student Health Center provides primary care and preventive services by appointment; it does not offer walk-in visits.',
+          'Schedule through MyChart or call during office hours. The center tries to accommodate same-day visits when possible.',
+          'The center is at 1180 Morris Park Avenue, floor 2, room 220.'
+        ],
+        url: 'https://einsteinmed.edu/education/life-einstein/for-students/wellmed-health-wellness/student-health-center',
+        action: 'Open Student Health',
+        contacts: [{ type: 'phone', label: 'Appointments: 347-498-2439', href: 'tel:+13474982439' }],
+        sourceFile: 'Student Health / Student Health.docx',
+        provenance: 'The destination comes directly from the supplied document. Service and appointment details are from the same official page.'
+      }
+    ];
+
+    const state = { query: '', category: 'all', view: 'resources', favorites: new Set(loadFavorites()) };
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    const grid = document.getElementById('resourceGrid');
+    const favoritesGrid = document.getElementById('favoritesGrid');
+    const filters = document.getElementById('filters');
+    const summary = document.getElementById('resultSummary');
+    const emptyState = document.getElementById('emptyState');
+    const favoritesEmpty = document.getElementById('favoritesEmpty');
+    const favoritesSummary = document.getElementById('favoritesSummary');
+    const favoriteCount = document.getElementById('favoriteCount');
+    const resourceDialog = document.getElementById('resourceDialog');
+    const dialogBody = document.getElementById('dialogBody');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeLabel = document.getElementById('themeLabel');
+
+    function applyTheme(theme, persist = true) {
+      const dark = theme === 'dark';
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      themeToggle.setAttribute('aria-pressed', String(dark));
+      themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+      themeToggle.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+      themeLabel.textContent = dark ? 'Light mode' : 'Dark mode';
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#061727' : '#003d7e');
+      if (persist) {
+        try { localStorage.setItem('einstein-resource-theme', dark ? 'dark' : 'light'); } catch (_) {}
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+    });
+
+    function loadFavorites() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('einstein-resource-favorites') || '[]');
+        return Array.isArray(saved) ? saved.filter(id => resources.some(resource => resource.id === id)) : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveFavorites() {
+      try {
+        localStorage.setItem('einstein-resource-favorites', JSON.stringify([...state.favorites]));
+      } catch (_) {
+        // Favorites remain available for this session when storage is unavailable.
+      }
+    }
+
+    function normalize(value) {
+      return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+    }
+
+    function highlight(value, query) {
+      if (!query.trim()) return escapeHtml(value);
+      const terms = [...new Set(normalize(query).split(' ').filter(term => term.length > 1))]
+        .sort((a, b) => b.length - a.length)
+        .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      if (!terms.length) return escapeHtml(value);
+      return escapeHtml(value).replace(new RegExp(`(${terms.join('|')})`, 'gi'), '<mark>$1</mark>');
+    }
+
+    function scoreResource(resource, query) {
+      const q = normalize(query);
+      if (!q) return resource.featured ? 2 : 1;
+      const terms = q.split(' ').filter(Boolean);
+      const fields = {
+        title: normalize(resource.title),
+        category: normalize(categoryMeta[resource.category].label),
+        description: normalize(resource.description),
+        keywords: normalize(resource.keywords),
+        details: normalize(resource.details.join(' '))
+      };
+      const fullText = Object.values(fields).join(' ');
+      if (!terms.every(term => fullText.includes(term))) return -1;
+      let score = 0;
+      if (fields.title === q) score += 80;
+      if (fields.title.startsWith(q)) score += 35;
+      if (fields.title.includes(q)) score += 22;
+      if (fields.keywords.includes(q)) score += 12;
+      terms.forEach(term => {
+        if (fields.title.includes(term)) score += 18;
+        if (fields.category.includes(term)) score += 10;
+        if (fields.keywords.includes(term)) score += 7;
+        if (fields.description.includes(term)) score += 4;
+        if (fields.details.includes(term)) score += 2;
+      });
+      return score + (resource.featured ? 1 : 0);
+    }
+
+    function getVisibleResources() {
+      return resources
+        .filter(resource => state.category === 'all' || resource.category === state.category)
+        .map(resource => ({ resource, score: scoreResource(resource, state.query) }))
+        .filter(item => item.score >= 0)
+        .sort((a, b) => b.score - a.score || a.resource.title.localeCompare(b.resource.title))
+        .map(item => item.resource);
+    }
+
+    function renderFilters() {
+      const items = [
+        { id: 'all', label: 'All resources', count: resources.length },
+        ...Object.entries(categoryMeta).map(([id, meta]) => ({ id, label: meta.label, count: resources.filter(r => r.category === id).length }))
+      ];
+      filters.innerHTML = items.map(item => `
+        <button class="filter-chip ${state.category === item.id ? 'active' : ''}" type="button" data-category="${item.id}" aria-pressed="${state.category === item.id}">
+          ${item.label}<span class="filter-count">${item.count}</span>
+        </button>`).join('');
+    }
+
+    function cardTemplate(resource, index, query = '') {
+      const meta = categoryMeta[resource.category];
+      const saved = state.favorites.has(resource.id);
+      return `
+        <article class="resource-card" style="--category-color:${meta.color};--category-soft:${meta.soft};animation-delay:${Math.min(index * 35, 210)}ms">
+          <div class="card-head">
+            <div class="resource-icon">${icons[resource.icon]}</div>
+            <div class="card-badges">
+              <span class="source-pill">Official link</span>
+              <button class="favorite-button ${saved ? 'active' : ''}" type="button" data-favorite-id="${resource.id}" aria-label="${saved ? 'Remove' : 'Save'} ${escapeHtml(resource.title)} ${saved ? 'from' : 'to'} favorites" aria-pressed="${saved}" title="${saved ? 'Remove from favorites' : 'Save to favorites'}">${icons.favorite}</button>
+            </div>
+          </div>
+          <p class="card-category">${meta.label}</p>
+          <h3>${highlight(resource.title, query)}</h3>
+          <p class="card-description">${highlight(resource.description, query)}</p>
+          <button class="card-action" type="button" data-resource-id="${resource.id}" aria-label="View ${escapeHtml(resource.title)} details">
+            View resource ${icons.arrow}
+          </button>
+        </article>`;
+    }
+
+    function render() {
+      const visible = getVisibleResources();
+      renderFilters();
+      grid.innerHTML = visible.map((resource, index) => cardTemplate(resource, index, state.query)).join('');
+      emptyState.classList.toggle('visible', visible.length === 0);
+      grid.hidden = visible.length === 0;
+      const label = visible.length === 1 ? 'resource' : 'resources';
+      summary.textContent = `${visible.length} ${label}${state.query ? ` for “${state.query}”` : ''}`;
+      clearSearch.classList.toggle('visible', Boolean(state.query));
+
+      const savedResources = resources.filter(resource => state.favorites.has(resource.id));
+      favoritesGrid.innerHTML = savedResources.map((resource, index) => cardTemplate(resource, index)).join('');
+      favoritesGrid.hidden = savedResources.length === 0;
+      favoritesEmpty.classList.toggle('visible', savedResources.length === 0);
+      favoriteCount.textContent = savedResources.length;
+      favoritesSummary.textContent = `${savedResources.length} saved ${savedResources.length === 1 ? 'resource' : 'resources'}`;
+    }
+
+    function toggleFavorite(id) {
+      if (state.favorites.has(id)) state.favorites.delete(id);
+      else state.favorites.add(id);
+      saveFavorites();
+      render();
+      const dialogFavorite = dialogBody.querySelector('[data-favorite-id]');
+      if (dialogFavorite && dialogFavorite.dataset.favoriteId === id) {
+        const saved = state.favorites.has(id);
+        dialogFavorite.classList.toggle('active', saved);
+        dialogFavorite.setAttribute('aria-pressed', String(saved));
+        dialogFavorite.innerHTML = `${icons.favorite}${saved ? 'Saved to favorites' : 'Save to favorites'}`;
+      }
+    }
+
+    function contactTemplate(contact) {
+      return `<a class="contact-link" href="${contact.href}">${icons[contact.type]}${escapeHtml(contact.label)}</a>`;
+    }
+
+    function openResource(id) {
+      const resource = resources.find(item => item.id === id);
+      if (!resource) return;
+      const meta = categoryMeta[resource.category];
+      const saved = state.favorites.has(resource.id);
+      dialogBody.style.setProperty('--dialog-color', meta.color);
+      dialogBody.innerHTML = `
+        <div class="resource-icon dialog-icon" style="--category-color:${meta.color};--category-soft:${meta.soft}">${icons[resource.icon]}</div>
+        <p class="dialog-category">${meta.label}</p>
+        <h2 id="dialogTitle">${escapeHtml(resource.title)}</h2>
+        <p class="dialog-description">${escapeHtml(resource.description)}</p>
+        <div class="crisis-box ${resource.crisis ? 'visible' : ''}"><strong>Need help now?</strong>If you are in danger or need immediate medical attention, call 911. For 24/7 crisis support, call or text 988.</div>
+        <ol class="detail-list">${resource.details.map(detail => `<li>${escapeHtml(detail)}</li>`).join('')}</ol>
+        ${resource.contacts.length ? `<div class="contact-row">${resource.contacts.map(contactTemplate).join('')}</div>` : ''}
+        <div class="dialog-actions">
+          <a class="primary-link" href="${resource.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(resource.action)}${icons.external}</a>
+          ${resource.secondary ? `<a class="secondary-link" href="${resource.secondary.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(resource.secondary.label)}${icons.external}</a>` : ''}
+          <button class="secondary-link favorite-dialog-button ${saved ? 'active' : ''}" type="button" data-favorite-id="${resource.id}" aria-pressed="${saved}">${icons.favorite}${saved ? 'Saved to favorites' : 'Save to favorites'}</button>
+        </div>
+        <div class="source-box"><strong>How this result was sourced</strong><span class="source-file">${escapeHtml(resource.sourceFile)}</span><br>${escapeHtml(resource.provenance)}</div>`;
+      if (!resourceDialog.open) resourceDialog.showModal();
+    }
+
+    searchInput.addEventListener('input', event => {
+      state.query = event.target.value.trim();
+      render();
+    });
+
+    clearSearch.addEventListener('click', event => {
+      event.preventDefault();
+      state.query = '';
+      searchInput.value = '';
+      searchInput.focus();
+      render();
+    });
+
+    filters.addEventListener('click', event => {
+      const button = event.target.closest('[data-category]');
+      if (!button) return;
+      state.category = button.dataset.category;
+      render();
+    });
+
+    function handleResourceGridClick(event) {
+      const favoriteButton = event.target.closest('[data-favorite-id]');
+      if (favoriteButton) {
+        toggleFavorite(favoriteButton.dataset.favoriteId);
+        return;
+      }
+      const button = event.target.closest('[data-resource-id]');
+      if (button) openResource(button.dataset.resourceId);
+    }
+
+    grid.addEventListener('click', handleResourceGridClick);
+    favoritesGrid.addEventListener('click', handleResourceGridClick);
+    dialogBody.addEventListener('click', event => {
+      const button = event.target.closest('[data-favorite-id]');
+      if (button) toggleFavorite(button.dataset.favoriteId);
+    });
+
+    function setView(view, shouldScroll = true) {
+      state.view = view;
+      document.querySelectorAll('.view').forEach(panel => {
+        panel.hidden = panel.id !== `${view}View`;
+      });
+      document.querySelectorAll('[data-view]').forEach(tab => {
+        const active = tab.dataset.view === view;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+      document.querySelector('.hero').hidden = view !== 'resources';
+      if (shouldScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelector('.app-tabs').addEventListener('click', event => {
+      const tab = event.target.closest('[data-view]');
+      if (tab) setView(tab.dataset.view);
+    });
+
+    document.querySelector('.brand').addEventListener('click', event => {
+      event.preventDefault();
+      setView('resources');
+    });
+
+    document.getElementById('browseResources').addEventListener('click', () => setView('resources'));
+
+    document.querySelectorAll('.suggestion').forEach(button => {
+      button.addEventListener('click', () => {
+        setView('resources', false);
+        state.query = button.dataset.query;
+        state.category = 'all';
+        searchInput.value = state.query;
+        render();
+        document.getElementById('resources').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    document.getElementById('resetSearch').addEventListener('click', () => {
+      state.query = '';
+      state.category = 'all';
+      searchInput.value = '';
+      render();
+      searchInput.focus();
+    });
+
+    document.getElementById('openHelp').addEventListener('click', () => document.getElementById('helpDialog').showModal());
+
+    const feedbackResource = document.getElementById('feedbackResource');
+    resources.forEach(resource => {
+      const option = document.createElement('option');
+      option.value = resource.title;
+      option.textContent = resource.title;
+      feedbackResource.appendChild(option);
+    });
+
+    function buildFeedbackMessage() {
+      const type = document.querySelector('input[name="feedbackType"]:checked').value;
+      const related = feedbackResource.value;
+      const details = document.getElementById('feedbackDetails').value.trim();
+      return `Student Resource Finder feedback\n\nType: ${type}\nRelated resource: ${related}\n\nDetails:\n${details}`;
+    }
+
+    document.getElementById('feedbackForm').addEventListener('submit', event => {
+      event.preventDefault();
+      if (!event.currentTarget.reportValidity()) return;
+      const type = document.querySelector('input[name="feedbackType"]:checked').value;
+      const subject = encodeURIComponent(`Student Resource Finder: ${type}`);
+      const body = encodeURIComponent(buildFeedbackMessage());
+      window.location.href = `mailto:student-resources@example.edu?subject=${subject}&body=${body}`;
+      document.getElementById('feedbackStatus').textContent = 'Draft opened in your email app.';
+    });
+
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const helper = document.createElement('textarea');
+      helper.value = text;
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand('copy');
+      helper.remove();
+    }
+
+    document.getElementById('copyFeedback').addEventListener('click', async () => {
+      const details = document.getElementById('feedbackDetails');
+      if (!details.value.trim()) {
+        details.reportValidity();
+        details.focus();
+        return;
+      }
+      const status = document.getElementById('feedbackStatus');
+      try {
+        await copyText(buildFeedbackMessage());
+        status.textContent = 'Feedback copied to your clipboard.';
+      } catch (_) {
+        status.textContent = 'Could not copy automatically. Select the details and copy them manually.';
+      }
+    });
+
+    document.querySelectorAll('[data-close]').forEach(button => {
+      button.addEventListener('click', () => document.getElementById(button.dataset.close).close());
+    });
+
+    document.querySelectorAll('dialog').forEach(dialog => {
+      dialog.addEventListener('click', event => {
+        const rect = dialog.getBoundingClientRect();
+        const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+        if (outside) dialog.close();
+      });
+    });
+
+    document.addEventListener('keydown', event => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setView('resources', false);
+        searchInput.focus();
+        searchInput.select();
+      }
+      if (event.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+        event.preventDefault();
+        setView('resources', false);
+        searchInput.focus();
+      }
+    });
+
+    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', false);
+    render();
+    setView('resources', false);
+  </script>
+</body>
+</html>
