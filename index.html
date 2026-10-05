@@ -133,15 +133,6 @@
 
     .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
 
-    .brand small {
-      display: block;
-      color: var(--muted);
-      font-size: .68rem;
-      font-weight: 650;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
     .nav-links {
       display: flex;
       align-items: center;
@@ -149,7 +140,6 @@
     }
 
     .nav-link,
-    .help-button,
     .theme-toggle {
       min-height: 42px;
       display: inline-flex;
@@ -180,16 +170,6 @@
     .theme-icon-sun { display: none; }
     :root[data-theme="dark"] .theme-icon-moon { display: none; }
     :root[data-theme="dark"] .theme-icon-sun { display: block; }
-
-    .help-button {
-      gap: 8px;
-      color: #fff;
-      background: var(--green);
-      box-shadow: 0 6px 14px rgba(0, 61, 126, .2);
-    }
-
-    .help-button:hover { background: var(--green-dark); }
-    .help-button svg { width: 17px; height: 17px; }
 
     .tabbar-wrap {
       border-top: 1px solid rgba(155, 190, 216, .58);
@@ -398,29 +378,6 @@
     .clear-search:hover { color: var(--green); background: var(--green-soft); }
     .clear-search svg { width: 17px; height: 17px; }
 
-    .suggestions {
-      margin-top: 17px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      color: var(--muted);
-      font-size: .78rem;
-    }
-
-    .suggestion {
-      border: 1px solid rgba(0, 61, 126, .17);
-      border-radius: 999px;
-      padding: 7px 11px;
-      color: var(--ink);
-      background: rgba(255,255,255,.63);
-      font-weight: 680;
-      cursor: pointer;
-    }
-
-    .suggestion:hover { border-color: rgba(0, 61, 126, .4); color: var(--green); background: var(--surface); }
-
     main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
     .view[hidden], .hero[hidden] { display: none; }
 
@@ -511,6 +468,43 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 17px;
+    }
+
+    .resource-groups { display: grid; gap: 42px; }
+    .resource-group-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 17px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+    }
+
+    .resource-group-heading h3 {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0;
+      color: var(--category-color);
+      font-size: 1rem;
+      letter-spacing: -.01em;
+    }
+
+    .resource-group-heading h3::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--category-color);
+      box-shadow: 0 0 0 5px var(--category-soft);
+    }
+
+    .resource-group-count {
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 720;
+      white-space: nowrap;
     }
 
     .resource-card {
@@ -606,7 +600,7 @@
       text-transform: uppercase;
     }
 
-    .resource-card h3 {
+    .resource-card .resource-title {
       margin: 0;
       font-size: 1.17rem;
       line-height: 1.25;
@@ -970,28 +964,6 @@
     .secondary-link { border: 1px solid var(--line); color: var(--ink); background: var(--paper); }
     .primary-link svg, .secondary-link svg { width: 16px; height: 16px; }
 
-    .source-box {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px 15px;
-      background: var(--paper);
-      color: var(--muted);
-      font-size: .72rem;
-      line-height: 1.5;
-    }
-
-    .source-box strong { display: block; margin-bottom: 2px; color: var(--ink); font-size: .74rem; }
-    .source-file { overflow-wrap: anywhere; }
-
-    .help-dialog .dialog-body { padding-top: 0; }
-    .help-dialog h2 { margin-bottom: 12px; color: var(--plum); }
-    .help-dialog .dialog-description { margin-top: 0; }
-    .emergency-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 23px 0; }
-    .emergency-link { min-height: 74px; display: flex; flex-direction: column; justify-content: center; border-radius: 14px; padding: 13px 15px; text-decoration: none; background: var(--plum-soft); color: var(--plum); }
-    .emergency-link strong { font-size: 1.05rem; }
-    .emergency-link span { margin-top: 3px; font-size: .73rem; }
-    .emergency-link.urgent { color: var(--blue); background: var(--coral-soft); }
-
     :root[data-theme="dark"] .site-header {
       border-color: rgba(70, 112, 146, .72);
       background: rgba(6, 23, 39, .92);
@@ -1009,7 +981,6 @@
       background: #0d2942;
     }
 
-    :root[data-theme="dark"] .help-button,
     :root[data-theme="dark"] .filter-chip.active,
     :root[data-theme="dark"] .primary-link,
     :root[data-theme="dark"] .reset-button {
@@ -1018,7 +989,6 @@
       background: #155f98;
     }
 
-    :root[data-theme="dark"] .help-button:hover,
     :root[data-theme="dark"] .primary-link:hover { background: #1d75ad; }
 
     :root[data-theme="dark"] .hero {
@@ -1038,8 +1008,6 @@
 
     :root[data-theme="dark"] .search-box:focus-within { border-color: #95c6e7; box-shadow: 0 20px 46px rgba(0, 0, 0, .3), 0 0 0 4px rgba(149, 198, 231, .1); }
     :root[data-theme="dark"] #searchInput::placeholder { color: #849caf; }
-    :root[data-theme="dark"] .suggestion { color: var(--ink); background: rgba(14, 42, 66, .78); }
-    :root[data-theme="dark"] .suggestion:hover { background: #143a58; }
     :root[data-theme="dark"] .app-tab:hover { background: rgba(149, 198, 231, .07); }
 
     :root[data-theme="dark"] .filter-chip,
@@ -1047,7 +1015,6 @@
     :root[data-theme="dark"] .source-pill,
     :root[data-theme="dark"] .contact-link,
     :root[data-theme="dark"] .secondary-link,
-    :root[data-theme="dark"] .source-box,
     :root[data-theme="dark"] .dialog-close {
       color: var(--muted);
       background: #0e2a43;
@@ -1088,8 +1055,6 @@
     :root[data-theme="dark"] dialog::backdrop { background: rgba(0, 9, 18, .72); }
     :root[data-theme="dark"] .dialog-top { background: linear-gradient(var(--surface-strong) 62%, transparent); }
     :root[data-theme="dark"] .crisis-box { border-color: #32658a; color: #d9effd; background: #123653; }
-    :root[data-theme="dark"] .emergency-link { color: #bde3f8; background: #153b59; }
-    :root[data-theme="dark"] .emergency-link.urgent { color: #cbe9fa; background: #194866; }
     :root[data-theme="dark"] .favorite-dialog-button.active,
     :root[data-theme="dark"] .favorite-button.active { color: #c6e8fa; border-color: #4f91bb; background: #184462; }
 
@@ -1101,23 +1066,22 @@
 
     @media (max-width: 660px) {
       .nav { width: min(100% - 28px, 1180px); min-height: 66px; }
-      .brand small, .nav-link { display: none; }
+      .nav-link { display: none; }
       .brand { gap: 8px; font-size: .82rem; }
       .brand-mark { width: 35px; height: 35px; border-radius: 10px; }
       .nav-links { gap: 6px; }
-      .theme-toggle, .help-button { width: 38px; min-height: 38px; padding: 0; gap: 0; }
+      .theme-toggle { width: 38px; min-height: 38px; padding: 0; gap: 0; }
       .theme-toggle span { display: none; }
-      .help-button { font-size: 0; }
       .app-tabs { width: min(100% - 16px, 1180px); min-height: 48px; }
       .app-tab { min-width: 0; flex: 1; padding: 0 7px; font-size: .75rem; }
       .hero-inner { width: min(100% - 28px, 920px); padding: 30px 0 32px; }
       .search-box { min-height: 64px; padding-left: 17px; border-radius: 16px; }
       .search-key { display: none; }
-      .suggestions > span { width: 100%; }
       main { width: min(100% - 28px, 1180px); }
       .browse-section { padding: 42px 0 58px; }
       .section-top { align-items: flex-start; flex-direction: column; gap: 10px; }
       .result-summary { margin: 0; }
+      .resource-group-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
       .resource-grid { grid-template-columns: 1fr; }
       .resource-card { min-height: 236px; }
       .info-copy { padding: 30px 24px; }
@@ -1127,7 +1091,6 @@
       .dialog-body { padding: 0 22px 25px; }
       .dialog-actions { flex-direction: column; }
       .primary-link, .secondary-link { width: 100%; }
-      .emergency-actions { grid-template-columns: 1fr; }
       .feedback-section { padding: 24px 0 54px; }
       .feedback-head { padding: 22px 20px 19px; }
       .feedback-form { padding: 27px 20px 25px; }
@@ -1149,17 +1112,13 @@
         <span class="brand-mark" aria-hidden="true">
           <img src="data:image/jpeg;base64,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" alt="">
         </span>
-        <span>Student Resource Finder<small>Einstein student prototype</small></span>
+        <span>Student Resource Finder</span>
       </a>
       <div class="nav-links">
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
           <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 15.2A9 9 0 0 1 8.8 3.2 9 9 0 1 0 20.8 15.2Z"/></svg>
           <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
           <span id="themeLabel">Dark mode</span>
-        </button>
-        <button class="help-button" id="openHelp" type="button" aria-label="Get urgent help" title="Get urgent help">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="M12 8v4M12 16h.01"/></svg>
-          Get urgent help
         </button>
       </div>
     </nav>
@@ -1186,18 +1145,12 @@
       <div class="search-shell">
         <label class="search-box" for="searchInput">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-          <input id="searchInput" type="search" autocomplete="off" placeholder="Try “Wi-Fi,” “mental health,” or “work order”" aria-describedby="searchHint">
+          <input id="searchInput" type="search" autocomplete="off" placeholder="Try “Wi-Fi,” “mental health,” or “work order”">
           <span class="search-key" aria-hidden="true">⌘ K</span>
           <button class="clear-search" id="clearSearch" type="button" aria-label="Clear search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>
           </button>
         </label>
-        <div class="suggestions" id="searchHint">
-          <span>Popular:</span>
-          <button class="suggestion" type="button" data-query="peer tutoring">Peer tutoring</button>
-          <button class="suggestion" type="button" data-query="student health">Student health</button>
-          <button class="suggestion" type="button" data-query="shuttle">Shuttle</button>
-        </div>
       </div>
     </div>
   </div>
@@ -1213,7 +1166,7 @@
           <p class="result-summary" id="resultSummary" aria-live="polite">9 resources</p>
         </div>
         <div class="filters" id="filters" aria-label="Filter by category"></div>
-        <div class="resource-grid" id="resourceGrid"></div>
+        <div class="resource-groups" id="resourceGrid"></div>
         <div class="empty-state" id="emptyState">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8.5 10h5M11 7.5v5"/></svg>
           <h3>No exact match yet</h3>
@@ -1286,29 +1239,6 @@
         </button>
       </div>
       <div class="dialog-body" id="dialogBody"></div>
-    </div>
-  </dialog>
-
-  <dialog class="help-dialog" id="helpDialog" aria-labelledby="helpTitle">
-    <div class="dialog-scroll">
-      <div class="dialog-top">
-        <button class="dialog-close" type="button" data-close="helpDialog" aria-label="Close urgent help">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>
-        </button>
-      </div>
-      <div class="dialog-body">
-        <p class="section-kicker">Immediate support</p>
-        <h2 id="helpTitle">You don’t have to handle a crisis alone.</h2>
-        <p class="dialog-description">If you or someone else is in immediate danger or needs urgent medical attention, call 911. Free, confidential crisis support is also available 24/7.</p>
-        <div class="emergency-actions">
-          <a class="emergency-link urgent" href="tel:911"><strong>Call 911</strong><span>Immediate danger or medical emergency</span></a>
-          <a class="emergency-link" href="tel:988"><strong>Call or text 988</strong><span>Suicide &amp; Crisis Lifeline</span></a>
-        </div>
-        <a class="primary-link" href="https://einsteinmed.edu/education/life-einstein/for-students/health-wellness/student-mental-health-center" target="_blank" rel="noopener noreferrer">
-          Einstein mental health resources
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
-        </a>
-      </div>
     </div>
   </dialog>
 
@@ -1715,7 +1645,7 @@
         </button>`).join('');
     }
 
-    function cardTemplate(resource, index, query = '') {
+    function cardTemplate(resource, index, query = '', headingTag = 'h3') {
       const meta = categoryMeta[resource.category];
       const saved = state.favorites.has(resource.id);
       return `
@@ -1728,7 +1658,7 @@
             </div>
           </div>
           <p class="card-category">${meta.label}</p>
-          <h3>${highlight(resource.title, query)}</h3>
+          <${headingTag} class="resource-title">${highlight(resource.title, query)}</${headingTag}>
           <p class="card-description">${highlight(resource.description, query)}</p>
           <button class="card-action" type="button" data-resource-id="${resource.id}" aria-label="View ${escapeHtml(resource.title)} details">
             View resource ${icons.arrow}
@@ -1736,10 +1666,29 @@
         </article>`;
     }
 
+    function groupedCardsTemplate(visible, query = '') {
+      let cardIndex = 0;
+      return Object.entries(categoryMeta).map(([category, meta]) => {
+        const groupedResources = visible.filter(resource => resource.category === category);
+        if (!groupedResources.length) return '';
+        const count = groupedResources.length;
+        return `
+          <section class="resource-group" style="--category-color:${meta.color};--category-soft:${meta.soft}" aria-labelledby="category-${category}">
+            <div class="resource-group-heading">
+              <h3 id="category-${category}">${escapeHtml(meta.label)}</h3>
+              <span class="resource-group-count">${count} ${count === 1 ? 'resource' : 'resources'}</span>
+            </div>
+            <div class="resource-grid">
+              ${groupedResources.map(resource => cardTemplate(resource, cardIndex++, query, 'h4')).join('')}
+            </div>
+          </section>`;
+      }).join('');
+    }
+
     function render() {
       const visible = getVisibleResources();
       renderFilters();
-      grid.innerHTML = visible.map((resource, index) => cardTemplate(resource, index, state.query)).join('');
+      grid.innerHTML = groupedCardsTemplate(visible, state.query);
       emptyState.classList.toggle('visible', visible.length === 0);
       grid.hidden = visible.length === 0;
       const label = visible.length === 1 ? 'resource' : 'resources';
@@ -1790,8 +1739,7 @@
           <a class="primary-link" href="${resource.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(resource.action)}${icons.external}</a>
           ${resource.secondary ? `<a class="secondary-link" href="${resource.secondary.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(resource.secondary.label)}${icons.external}</a>` : ''}
           <button class="secondary-link favorite-dialog-button ${saved ? 'active' : ''}" type="button" data-favorite-id="${resource.id}" aria-pressed="${saved}">${icons.favorite}${saved ? 'Saved to favorites' : 'Save to favorites'}</button>
-        </div>
-        <div class="source-box"><strong>How this result was sourced</strong><span class="source-file">${escapeHtml(resource.sourceFile)}</span><br>${escapeHtml(resource.provenance)}</div>`;
+        </div>`;
       if (!resourceDialog.open) resourceDialog.showModal();
     }
 
@@ -1858,17 +1806,6 @@
 
     document.getElementById('browseResources').addEventListener('click', () => setView('resources'));
 
-    document.querySelectorAll('.suggestion').forEach(button => {
-      button.addEventListener('click', () => {
-        setView('resources', false);
-        state.query = button.dataset.query;
-        state.category = 'all';
-        searchInput.value = state.query;
-        render();
-        document.getElementById('resources').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
     document.getElementById('resetSearch').addEventListener('click', () => {
       state.query = '';
       state.category = 'all';
@@ -1876,8 +1813,6 @@
       render();
       searchInput.focus();
     });
-
-    document.getElementById('openHelp').addEventListener('click', () => document.getElementById('helpDialog').showModal());
 
     const feedbackResource = document.getElementById('feedbackResource');
 
