@@ -482,22 +482,10 @@
     }
 
     .resource-group-heading h3 {
-      display: flex;
-      align-items: center;
-      gap: 9px;
       margin: 0;
       color: var(--category-color);
       font-size: 1rem;
       letter-spacing: -.01em;
-    }
-
-    .resource-group-heading h3::before {
-      content: "";
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--category-color);
-      box-shadow: 0 0 0 5px var(--category-soft);
     }
 
     .resource-group-count {
@@ -533,7 +521,23 @@
     }
 
     .card-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
-    .card-badges { display: flex; align-items: center; gap: 7px; }
+
+    .card-open {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border: 0;
+      border-radius: inherit;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .resource-card > :not(.card-open):not(.favorite-button) {
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+    }
 
     .resource-icon {
       width: 46px;
@@ -548,29 +552,11 @@
 
     .resource-icon svg { width: 23px; height: 23px; }
 
-    .source-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 2px;
-      padding: 6px 8px;
-      border-radius: 999px;
-      color: var(--muted);
-      background: var(--paper);
-      font-size: .65rem;
-      font-weight: 780;
-      white-space: nowrap;
-    }
-
-    .source-pill::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #2a75ad;
-    }
-
     .favorite-button {
+      position: absolute;
+      top: 23px;
+      right: 23px;
+      z-index: 3;
       width: 34px;
       height: 34px;
       display: grid;
@@ -633,7 +619,6 @@
       background: transparent;
       font-size: .82rem;
       font-weight: 780;
-      cursor: pointer;
       text-align: left;
     }
 
@@ -1012,7 +997,6 @@
 
     :root[data-theme="dark"] .filter-chip,
     :root[data-theme="dark"] .favorite-button,
-    :root[data-theme="dark"] .source-pill,
     :root[data-theme="dark"] .contact-link,
     :root[data-theme="dark"] .secondary-link,
     :root[data-theme="dark"] .dialog-close {
@@ -1024,6 +1008,8 @@
       color: #c6e7fa;
       background: color-mix(in srgb, var(--category-color) 32%, #0b2136);
     }
+
+    :root[data-theme="dark"] .resource-group-heading h3 { color: #fff; }
 
     :root[data-theme="dark"] .feedback-head {
       background:
@@ -1650,19 +1636,17 @@
       const saved = state.favorites.has(resource.id);
       return `
         <article class="resource-card" style="--category-color:${meta.color};--category-soft:${meta.soft};animation-delay:${Math.min(index * 35, 210)}ms">
+          <button class="card-open" type="button" data-resource-id="${resource.id}" aria-label="View ${escapeHtml(resource.title)} details"></button>
           <div class="card-head">
             <div class="resource-icon">${icons[resource.icon]}</div>
-            <div class="card-badges">
-              <span class="source-pill">Official link</span>
-              <button class="favorite-button ${saved ? 'active' : ''}" type="button" data-favorite-id="${resource.id}" aria-label="${saved ? 'Remove' : 'Save'} ${escapeHtml(resource.title)} ${saved ? 'from' : 'to'} favorites" aria-pressed="${saved}" title="${saved ? 'Remove from favorites' : 'Save to favorites'}">${icons.favorite}</button>
-            </div>
           </div>
+          <button class="favorite-button ${saved ? 'active' : ''}" type="button" data-favorite-id="${resource.id}" aria-label="${saved ? 'Remove' : 'Save'} ${escapeHtml(resource.title)} ${saved ? 'from' : 'to'} favorites" aria-pressed="${saved}" title="${saved ? 'Remove from favorites' : 'Save to favorites'}">${icons.favorite}</button>
           <p class="card-category">${meta.label}</p>
           <${headingTag} class="resource-title">${highlight(resource.title, query)}</${headingTag}>
           <p class="card-description">${highlight(resource.description, query)}</p>
-          <button class="card-action" type="button" data-resource-id="${resource.id}" aria-label="View ${escapeHtml(resource.title)} details">
+          <span class="card-action" aria-hidden="true">
             View resource ${icons.arrow}
-          </button>
+          </span>
         </article>`;
     }
 
